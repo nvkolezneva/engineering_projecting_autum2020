@@ -10,10 +10,6 @@ class News(models.Model):
     )
     body = models.TextField("Новость")
     dateAdd = models.DateField(auto_now=True, auto_now_add=False)
-    comments = models.ForeignKey(
-        'Comments',
-        on_delete=models.CASCADE,
-    )
     categories = models.ForeignKey(
         'CategoriesNews',
         on_delete=models.CASCADE,
@@ -26,9 +22,22 @@ class News(models.Model):
         verbose_name = "Новость"
         verbose_name_plural = "Новости"
 
+class Sports(models.Model):
+    """Виды спорта"""
+    NameSport = models.TextField("Вид спорта")
+    category_participants = models.ManyToManyField(
+        'CategoryParticipants'
+    )
+    def __str__(self):
+        return self.NameSport
+
+    class Meta:
+        verbose_name = "Вид спорта"
+        verbose_name_plural = "Виды спорта"
+
 class CategoriesNews(models.Model):
     """Категории новостей"""
-    CategoryNew = models.TextField("Категория")
+    CategoryNew = models.CharField("Категория новостей",max_length=200)
 
     def __str__(self):
         return self.CategoryNew
@@ -43,7 +52,10 @@ class Comments(models.Model):
         'Users',
         on_delete=models.CASCADE,
     )
-    idNew = models.IntegerField()
+    idNew = models.ForeignKey(
+        'News',
+        on_delete=models.CASCADE,
+    )
     text = models.TextField("Текст комментария")
     dateCommentAdd = models.DateField(auto_now=True, auto_now_add=False)
 
@@ -59,18 +71,13 @@ class Events(models.Model):
     nameEvent = models.CharField("Мероприятие", max_length=200)
     locationEvent = models.CharField("Место проведения", max_length=200)
     dateEvent = models.DateField(auto_now=True, auto_now_add=False)
-    sports = models.ForeignKey(
-        'Sports',
-        on_delete=models.CASCADE,
+    idSport = models.ManyToManyField(
+        'Sports'
     )
-    teams = models.ForeignKey(
-        'Teams',
-        on_delete=models.CASCADE,
+    idNew = models.ManyToManyField(
+        'News'
     )
-    category_participants = models.ForeignKey(
-        'CategoryParticipants',
-        on_delete=models.CASCADE,
-    )
+    
 
     def __str__(self):
         return self.nameEvent
@@ -81,7 +88,7 @@ class Events(models.Model):
 
 class CategoryParticipants(models.Model):
     """Категории участников"""
-    NameCategory = models.TextField("Имя категории")
+    NameCategory = models.CharField("Имя категории", max_length=200)
     ageParticipant = models.IntegerField()
     weightParticipant = models.IntegerField()
     def __str__(self):
@@ -94,8 +101,11 @@ class CategoryParticipants(models.Model):
 class Teams(models.Model):
     """Команды участников"""
     NameTeam = models.TextField("Название команды")
-    idUsers = models.ForeignKey(
-        'Users',
+    idUsers = models.ManyToManyField(
+        'Users'
+    )
+    idSport = models.ForeignKey(
+        'Sports',
         on_delete=models.CASCADE,
     )
     def __str__(self):
@@ -105,29 +115,11 @@ class Teams(models.Model):
         verbose_name = "Команда"
         verbose_name_plural = "Команды"
 
-class Sports(models.Model):
-    """Виды спорта"""
-    NameSport = models.TextField("Вид спорта")
-    category_participants = models.ForeignKey(
-        'CategoryParticipants',
-        on_delete=models.CASCADE,
-    )
-    def __str__(self):
-        return self.NameSport
-
-    class Meta:
-        verbose_name = "Вид"
-        verbose_name_plural = "Виды"
-
 class Results(models.Model):
     """Результаты соревнований"""
     points = models.IntegerField()
     idEvent = models.ForeignKey(
         'Events',
-        on_delete=models.CASCADE,
-    )
-    idSport = models.ForeignKey(
-        'Sports',
         on_delete=models.CASCADE,
     )
     idTeam = models.ForeignKey(
@@ -138,19 +130,19 @@ class Results(models.Model):
         return self.points
 
     class Meta:
-        verbose_name = "Результаты"
-        verbose_name_plural = "Результаты"
+        verbose_name = "Результаты соревнований"
+        verbose_name_plural = "Результаты соревнования"
 
 class Roles(models.Model):
     """Роли пользователей"""
-    NameRole = models.TextField("Название роли")
+    NameRole = models.CharField("Название роли",max_length=200)
 
     def __str__(self):
         return self.NameRole
 
     class Meta:
-        verbose_name = "Роль"
-        verbose_name_plural = "Роли"
+        verbose_name = "Роль пользователя"
+        verbose_name_plural = "Роли пользователей"
 
 class Users(models.Model):
     """Пользователи"""
@@ -159,8 +151,14 @@ class Users(models.Model):
     age = models.IntegerField()
     login = models.CharField("Логин", max_length=200)
     password = models.SlugField(max_length=50, unique=True)
-    sports = models.TextField("Виды спорта")
-    roles = models.TextField("Виды спорта")
+    idSport = models.ForeignKey(
+        'Sports',
+        on_delete=models.CASCADE,
+    )
+    idRole = models.ForeignKey(
+        'Roles',
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return self.name

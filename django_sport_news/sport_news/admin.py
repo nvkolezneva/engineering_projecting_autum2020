@@ -1,8 +1,10 @@
 from django.contrib import admin
 
 from .models import News, CategoriesNews, Comments, Events, CategoryParticipants, Teams, Sports, Results, Roles, Users
-
-admin.site.register(News)
+class NewsAdmin(admin.ModelAdmin):
+    """Новости"""
+    list_display = ("id", "idAuthor", "body", "dateAdd", "comments", "categories")
+admin.site.register(News, NewsAdmin)
 admin.site.register(CategoriesNews)
 admin.site.register(Comments)
 admin.site.register(Events)
