@@ -64,7 +64,7 @@ class EventsAdmin(admin.ModelAdmin):
     list_filter = ("nameEvent",)
     search_fields = ("nameEvent",)
     actions = ["notdone", "done"]
-
+    list_editable= ("DoneOrNot",)
     def notdone(self, request,queryset):
         """Отметка о непроведении мероприятия"""
         row_update = queryset.update(DoneOrNot=False)
