@@ -4,12 +4,13 @@ from django.db import models
 
 class News(models.Model):
     """Новости"""
-    idAuthor = models.ForeignKey(
+    Author = models.ForeignKey(
         'Users',
         on_delete=models.CASCADE,
     )
     body = models.TextField("Новость")
     dateAdd = models.DateField(auto_now=True, auto_now_add=False)
+    PublishedOrNot = models.BooleanField(default=False)
     categories = models.ForeignKey(
         'CategoriesNews',
         on_delete=models.CASCADE,
@@ -48,13 +49,14 @@ class CategoriesNews(models.Model):
 
 class Comments(models.Model):
     """Комментарии"""
-    idUser = models.ForeignKey(
+    User = models.ForeignKey(
         'Users',
         on_delete=models.CASCADE,
     )
-    idNew = models.ForeignKey(
-        'News',
-        on_delete=models.CASCADE,
+    New = models.ForeignKey(
+        News,
+        on_delete=models.CASCADE, verbose_name="Новости"
+
     )
     text = models.TextField("Текст комментария")
     dateCommentAdd = models.DateField(auto_now=True, auto_now_add=False)
@@ -71,10 +73,11 @@ class Events(models.Model):
     nameEvent = models.CharField("Мероприятие", max_length=200)
     locationEvent = models.CharField("Место проведения", max_length=200)
     dateEvent = models.DateField(auto_now=True, auto_now_add=False)
-    idSport = models.ManyToManyField(
+    DoneOrNot = models.BooleanField(default=False)
+    Sport = models.ManyToManyField(
         'Sports'
     )
-    idNew = models.ManyToManyField(
+    New = models.ManyToManyField(
         'News'
     )
     
@@ -100,11 +103,11 @@ class CategoryParticipants(models.Model):
 
 class Teams(models.Model):
     """Команды участников"""
-    NameTeam = models.TextField("Название команды")
-    idUsers = models.ManyToManyField(
+    NameTeam = models.CharField("Название команды", max_length=200)
+    Users = models.ManyToManyField(
         'Users'
     )
-    idSport = models.ForeignKey(
+    Sport = models.ForeignKey(
         'Sports',
         on_delete=models.CASCADE,
     )
@@ -117,17 +120,18 @@ class Teams(models.Model):
 
 class Results(models.Model):
     """Результаты соревнований"""
+    nameResult = models.CharField("Название результатов", max_length=200,default="null")
     points = models.IntegerField()
-    idEvent = models.ForeignKey(
+    Event = models.ForeignKey(
         'Events',
         on_delete=models.CASCADE,
     )
-    idTeam = models.ForeignKey(
+    Team = models.ForeignKey(
         'Teams',
         on_delete=models.CASCADE,
     )
     def __str__(self):
-        return self.points
+        return self.nameResult
 
     class Meta:
         verbose_name = "Результаты соревнований"
@@ -151,11 +155,11 @@ class Users(models.Model):
     age = models.IntegerField()
     login = models.CharField("Логин", max_length=200)
     password = models.SlugField(max_length=50, unique=True)
-    idSport = models.ForeignKey(
+    Sport = models.ForeignKey(
         'Sports',
         on_delete=models.CASCADE,
     )
-    idRole = models.ForeignKey(
+    Role = models.ForeignKey(
         'Roles',
         on_delete=models.CASCADE,
     )
