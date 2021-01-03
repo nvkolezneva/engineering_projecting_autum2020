@@ -1,12 +1,31 @@
 from django.contrib import admin
-
 from .models import News, CategoriesNews, Comments, Events, CategoryParticipants, Teams, Sports, Results, Roles, Users
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportActionModelAdmin
 
 class CommentsInline(admin.TabularInline):
     """Отзывы на странице новости"""
     model = Comments
     extra = 1
-
+class NewsAdmin(ImportExportActionModelAdmin):
+    pass
+class CategoriesNewsAdmin(ImportExportActionModelAdmin):
+    pass
+class CommentsAdmin(ImportExportActionModelAdmin):
+    pass
+class EventsAdmin(ImportExportActionModelAdmin):
+    pass
+class CategoryParticipantsAdmin(ImportExportActionModelAdmin):
+    pass
+class TeamsAdmin(ImportExportActionModelAdmin):
+    pass
+class SportsAdmin(ImportExportActionModelAdmin):
+    pass
+class ResultsAdmin(ImportExportActionModelAdmin):
+    pass
+class UsersAdmin(ImportExportActionModelAdmin):
+    pass
 class NewsAdmin(admin.ModelAdmin):
     """Новости"""
     list_display = ("id", "Author", "body", "dateAdd", "categories", "PublishedOrNot")
@@ -43,12 +62,39 @@ class NewsAdmin(admin.ModelAdmin):
     unpublished.short_description = "Снять с публикации"
     unpublished.allowed_permissions = ('change',)
 
+class NewsResource(resources.ModelResource):
+
+    class Meta:
+        model = News
+        skip_unchanged = True
+        report_skipped = False
+        widgets = {
+                'dateAdd': {'format': '%d.%m.%Y'},
+                }
+        fields = ("Author", "dateAdd", "categories","body","PublishedOrNot","comments")
+    
+    def dehydrate_full_title(self, new):
+        return '%s by %s' % (new.body, new.Author.name)
+
+class NewsAdmin(ImportExportModelAdmin):
+    resource_class = NewsResource
+
+
 class CategoriesNewsAdmin(admin.ModelAdmin):
     """Категории новостей"""
     list_display = ("id", "CategoryNew")
     list_display_links = ("CategoryNew",)
     search_fields = ("CategoryNew",)
+class CategoriesNewsResource(resources.ModelResource):
 
+    class Meta:
+        model = CategoriesNews
+        skip_unchanged = True
+        report_skipped = False
+        fields = ("CategoryNew",)
+
+class CategoriesNewsAdmin(ImportExportModelAdmin):
+    resource_class = CategoriesNewsResource
 
 class CommentsAdmin(admin.ModelAdmin):
     """Комментарии"""
@@ -56,6 +102,22 @@ class CommentsAdmin(admin.ModelAdmin):
     list_display_links = ("text",)
     list_filter = ("User",)
     search_fields = ("User__name",)
+class CommentsResource(resources.ModelResource):
+
+    class Meta:
+        model = Comments
+        skip_unchanged = True
+        report_skipped = False
+        widgets = {
+                'dateCommentAdd': {'format': '%d.%m.%Y'},
+                }
+        fields = ("User", "New", "text","dateCommentAdd")
+    
+    def dehydrate_full_title(self, comment):
+        return '%s by %s' % (comment.text, comment.User.name)
+
+class CommentsAdmin(ImportExportModelAdmin):
+    resource_class = CommentsResource
 
 class EventsAdmin(admin.ModelAdmin):
     """Мероприятия"""
@@ -89,6 +151,19 @@ class EventsAdmin(admin.ModelAdmin):
     notdone.short_description = "Не проводить мероприятие"
     notdone.allowed_permissions = ('change',)
     
+class EventsResource(resources.ModelResource):
+
+    class Meta:
+        model = Events
+        skip_unchanged = True
+        report_skipped = False
+        widgets = {
+                'dateEvent': {'format': '%d.%m.%Y'},
+                }
+        fields = ("nameEvent", "locationEvent", "dateEvent","DoneOrNot","Sport","New")
+
+class EventsAdmin(ImportExportModelAdmin):
+    resource_class = EventsResource
 
 class CategoryParticipantsAdmin(admin.ModelAdmin):
     """Категории участников"""
@@ -96,6 +171,16 @@ class CategoryParticipantsAdmin(admin.ModelAdmin):
     list_display_links = ("NameCategory",)
     list_filter = ("NameCategory",)
     search_fields = ("NameCategory",)
+class CategoryParticipantsResource(resources.ModelResource):
+
+    class Meta:
+        model = CategoryParticipants
+        skip_unchanged = True
+        report_skipped = False
+        fields = ("NameCategory", "ageParticipant", "weightParticipant")
+
+class CategoryParticipantsAdmin(ImportExportModelAdmin):
+    resource_class = CategoryParticipantsResource
 
 class TeamsAdmin(admin.ModelAdmin):
     """Команды"""
@@ -104,11 +189,33 @@ class TeamsAdmin(admin.ModelAdmin):
     list_filter = ("NameTeam",)
     search_fields = ("NameTeam",)
 
+class TeamsResource(resources.ModelResource):
+
+    class Meta:
+        model = Teams
+        skip_unchanged = True
+        report_skipped = False
+        fields = ("NameTeam", "Users", "Sport")
+
+class TeamsAdmin(ImportExportModelAdmin):
+    resource_class = TeamsResource
+
 class SportsAdmin(admin.ModelAdmin):
     """Виды спорта"""
     list_display = ("id", "NameSport")
     list_display_links = ("NameSport",)
     search_fields = ("NameSport",)
+
+class SportsResource(resources.ModelResource):
+
+    class Meta:
+        model = Sports
+        skip_unchanged = True
+        report_skipped = False
+        fields = ("NameSport", "category_participants")
+
+class SportsAdmin(ImportExportModelAdmin):
+    resource_class = SportsResource
 
 class ResultsAdmin(admin.ModelAdmin):
     """Результаты"""
@@ -116,6 +223,16 @@ class ResultsAdmin(admin.ModelAdmin):
     list_display_links = ("nameResult",)
     list_filter = ("nameResult",)
     search_fields = ("points",)
+class ResultsResource(resources.ModelResource):
+
+    class Meta:
+        model = Results
+        skip_unchanged = True
+        report_skipped = False
+        fields = ("nameResult", "points","Event","Team")
+
+class ResultsAdmin(ImportExportModelAdmin):
+    resource_class = ResultsResource
 
 class RolesAdmin(admin.ModelAdmin):
     """Роли пользователей"""
@@ -123,6 +240,16 @@ class RolesAdmin(admin.ModelAdmin):
     list_display_links = ("NameRole",)
     search_fields = ("NameRole",)
 
+class RolesResource(resources.ModelResource):
+
+    class Meta:
+        model = Roles
+        skip_unchanged = True
+        report_skipped = False
+        fields = ("NameRole")
+
+class RolesAdmin(ImportExportModelAdmin):
+    resource_class = RolesResource
 
 class UsersAdmin(admin.ModelAdmin):
     """Пользователи"""
@@ -131,6 +258,18 @@ class UsersAdmin(admin.ModelAdmin):
     list_filter = ("age",)
     search_fields = ("name",)
     readonly_fields = ("login","password")
+
+class UsersResource(resources.ModelResource):
+
+    class Meta:
+        model = Users
+        skip_unchanged = True
+        report_skipped = False
+        fields = ("name","gender","age","login","password","Sport","Role")
+
+class UsersAdmin(ImportExportModelAdmin):
+    resource_class = UsersResource
+
 admin.site.register(News, NewsAdmin)
 admin.site.register(CategoriesNews, CategoriesNewsAdmin)
 admin.site.register(Comments,CommentsAdmin)

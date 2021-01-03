@@ -101,7 +101,7 @@ class Comments(models.Model):
     )
     New = models.ForeignKey(
         News,
-        on_delete=models.CASCADE, verbose_name="Новости"
+        on_delete=models.CASCADE, verbose_name="Новости", related_name="comments"
 
     )
     text = models.TextField("Текст комментария")
