@@ -26,7 +26,22 @@ class ResultsAdmin(ImportExportActionModelAdmin):
     pass
 class UsersAdmin(ImportExportActionModelAdmin):
     pass
-class NewsAdmin(admin.ModelAdmin):
+
+class NewsResource(resources.ModelResource):
+
+    class Meta:
+        model = News
+        skip_unchanged = True
+        report_skipped = False
+        widgets = {
+                'dateAdd': {'format': '%d.%m.%Y'},
+                }
+        fields = ("Author", "dateAdd", "categories","body","PublishedOrNot","comments")
+    
+    def dehydrate_full_title(self, new):
+        return '%s by %s' % (new.body, new.Author.name)
+
+class NewsAdmin(ImportExportModelAdmin):
     """Новости"""
     list_display = ("id", "Author", "body", "dateAdd", "categories", "PublishedOrNot")
     list_display_links = ("body",)
@@ -61,30 +76,9 @@ class NewsAdmin(admin.ModelAdmin):
 
     unpublished.short_description = "Снять с публикации"
     unpublished.allowed_permissions = ('change',)
-
-class NewsResource(resources.ModelResource):
-
-    class Meta:
-        model = News
-        skip_unchanged = True
-        report_skipped = False
-        widgets = {
-                'dateAdd': {'format': '%d.%m.%Y'},
-                }
-        fields = ("Author", "dateAdd", "categories","body","PublishedOrNot","comments")
-    
-    def dehydrate_full_title(self, new):
-        return '%s by %s' % (new.body, new.Author.name)
-
-class NewsAdmin(ImportExportModelAdmin):
     resource_class = NewsResource
 
 
-class CategoriesNewsAdmin(admin.ModelAdmin):
-    """Категории новостей"""
-    list_display = ("id", "CategoryNew")
-    list_display_links = ("CategoryNew",)
-    search_fields = ("CategoryNew",)
 class CategoriesNewsResource(resources.ModelResource):
 
     class Meta:
@@ -94,14 +88,12 @@ class CategoriesNewsResource(resources.ModelResource):
         fields = ("CategoryNew",)
 
 class CategoriesNewsAdmin(ImportExportModelAdmin):
+    """Категории новостей"""
+    list_display = ("id", "CategoryNew")
+    list_display_links = ("CategoryNew",)
+    search_fields = ("CategoryNew",)
     resource_class = CategoriesNewsResource
 
-class CommentsAdmin(admin.ModelAdmin):
-    """Комментарии"""
-    list_display = ("id", "User","New","text","dateCommentAdd")
-    list_display_links = ("text",)
-    list_filter = ("User",)
-    search_fields = ("User__name",)
 class CommentsResource(resources.ModelResource):
 
     class Meta:
@@ -117,9 +109,26 @@ class CommentsResource(resources.ModelResource):
         return '%s by %s' % (comment.text, comment.User.name)
 
 class CommentsAdmin(ImportExportModelAdmin):
+    """Комментарии"""
+    list_display = ("id", "User","New","text","dateCommentAdd")
+    list_display_links = ("text",)
+    list_filter = ("User",)
+    search_fields = ("User__name",)
     resource_class = CommentsResource
 
-class EventsAdmin(admin.ModelAdmin):
+    
+class EventsResource(resources.ModelResource):
+
+    class Meta:
+        model = Events
+        skip_unchanged = True
+        report_skipped = False
+        widgets = {
+                'dateEvent': {'format': '%d.%m.%Y'},
+                }
+        fields = ("nameEvent", "locationEvent", "dateEvent","DoneOrNot","Sport","New")
+
+class EventsAdmin(ImportExportModelAdmin):
     """Мероприятия"""
     list_display = ("id", "nameEvent","locationEvent","dateEvent", "DoneOrNot")
     list_display_links = ("nameEvent",)
@@ -150,27 +159,9 @@ class EventsAdmin(admin.ModelAdmin):
 
     notdone.short_description = "Не проводить мероприятие"
     notdone.allowed_permissions = ('change',)
-    
-class EventsResource(resources.ModelResource):
-
-    class Meta:
-        model = Events
-        skip_unchanged = True
-        report_skipped = False
-        widgets = {
-                'dateEvent': {'format': '%d.%m.%Y'},
-                }
-        fields = ("nameEvent", "locationEvent", "dateEvent","DoneOrNot","Sport","New")
-
-class EventsAdmin(ImportExportModelAdmin):
     resource_class = EventsResource
 
-class CategoryParticipantsAdmin(admin.ModelAdmin):
-    """Категории участников"""
-    list_display = ("id", "NameCategory","ageParticipant","weightParticipant")
-    list_display_links = ("NameCategory",)
-    list_filter = ("NameCategory",)
-    search_fields = ("NameCategory",)
+
 class CategoryParticipantsResource(resources.ModelResource):
 
     class Meta:
@@ -180,14 +171,13 @@ class CategoryParticipantsResource(resources.ModelResource):
         fields = ("NameCategory", "ageParticipant", "weightParticipant")
 
 class CategoryParticipantsAdmin(ImportExportModelAdmin):
+    """Категории участников"""
+    list_display = ("id", "NameCategory","ageParticipant","weightParticipant")
+    list_display_links = ("NameCategory",)
+    list_filter = ("NameCategory",)
+    search_fields = ("NameCategory",)
     resource_class = CategoryParticipantsResource
 
-class TeamsAdmin(admin.ModelAdmin):
-    """Команды"""
-    list_display = ("id", "NameTeam","Sport")
-    list_display_links = ("NameTeam",)
-    list_filter = ("NameTeam",)
-    search_fields = ("NameTeam",)
 
 class TeamsResource(resources.ModelResource):
 
@@ -198,13 +188,12 @@ class TeamsResource(resources.ModelResource):
         fields = ("NameTeam", "Users", "Sport")
 
 class TeamsAdmin(ImportExportModelAdmin):
+    """Команды"""
+    list_display = ("id", "NameTeam","Sport")
+    list_display_links = ("NameTeam",)
+    list_filter = ("NameTeam",)
+    search_fields = ("NameTeam",)
     resource_class = TeamsResource
-
-class SportsAdmin(admin.ModelAdmin):
-    """Виды спорта"""
-    list_display = ("id", "NameSport")
-    list_display_links = ("NameSport",)
-    search_fields = ("NameSport",)
 
 class SportsResource(resources.ModelResource):
 
@@ -215,14 +204,12 @@ class SportsResource(resources.ModelResource):
         fields = ("NameSport", "category_participants")
 
 class SportsAdmin(ImportExportModelAdmin):
+    """Виды спорта"""
+    list_display = ("id", "NameSport")
+    list_display_links = ("NameSport",)
+    search_fields = ("NameSport",)
     resource_class = SportsResource
 
-class ResultsAdmin(admin.ModelAdmin):
-    """Результаты"""
-    list_display = ("id", "nameResult","points","Event", "Team")
-    list_display_links = ("nameResult",)
-    list_filter = ("nameResult",)
-    search_fields = ("points",)
 class ResultsResource(resources.ModelResource):
 
     class Meta:
@@ -232,13 +219,12 @@ class ResultsResource(resources.ModelResource):
         fields = ("nameResult", "points","Event","Team")
 
 class ResultsAdmin(ImportExportModelAdmin):
+    """Результаты"""
+    list_display = ("id", "nameResult","points","Event", "Team")
+    list_display_links = ("nameResult",)
+    list_filter = ("nameResult",)
+    search_fields = ("points",)
     resource_class = ResultsResource
-
-class RolesAdmin(admin.ModelAdmin):
-    """Роли пользователей"""
-    list_display = ("id", "NameRole")
-    list_display_links = ("NameRole",)
-    search_fields = ("NameRole",)
 
 class RolesResource(resources.ModelResource):
 
@@ -249,26 +235,28 @@ class RolesResource(resources.ModelResource):
         fields = ("NameRole")
 
 class RolesAdmin(ImportExportModelAdmin):
+    """Роли пользователей"""
+    list_display = ("id", "NameRole")
+    list_display_links = ("NameRole",)
+    search_fields = ("NameRole",)
     resource_class = RolesResource
 
-class UsersAdmin(admin.ModelAdmin):
-    """Пользователи"""
-    list_display = ("id", "name", "gender", "age", "login", "Sport", "Role" )
-    list_display_links = ("name",)
-    list_filter = ("age",)
-    search_fields = ("name",)
-    readonly_fields = ("login","password")
-
 class UsersResource(resources.ModelResource):
-
     class Meta:
         model = Users
         skip_unchanged = True
         report_skipped = False
         fields = ("name","gender","age","login","password","Sport","Role")
+        
 
 class UsersAdmin(ImportExportModelAdmin):
+    list_display = ("id", "name", "gender", "age", "login", "Sport", "Role" )
+    list_display_links = ("name",)
+    list_filter = ("age",)
+    search_fields = ("name",)
+    readonly_fields = ("login","password")
     resource_class = UsersResource
+
 
 admin.site.register(News, NewsAdmin)
 admin.site.register(CategoriesNews, CategoriesNewsAdmin)
