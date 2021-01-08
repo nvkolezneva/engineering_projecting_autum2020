@@ -1,8 +1,19 @@
 from django.contrib import admin
-from .models import News, CategoriesNews, Comments, Events, CategoryParticipants, Teams, Sports, Results, Roles, Users
+from .models import News, CategoriesNews, Comments, Events, CategoryParticipants, Teams, Sports, Results, Roles, Users,UserProfile
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export.admin import ImportExportActionModelAdmin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+
+class UserInline(admin.StackedInline):
+    model = UserProfile
+    can_delete = False
+    verbose_name_plural = 'Доп. информация'
+ 
+# Определяем новый класс настроек для модели User
+class UserAdmin(UserAdmin):
+    inlines = (UserInline, )
 
 class CommentsInline(admin.TabularInline):
     """Отзывы на странице новости"""
@@ -257,7 +268,8 @@ class UsersAdmin(ImportExportModelAdmin):
     readonly_fields = ("login","password")
     resource_class = UsersResource
 
-
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 admin.site.register(News, NewsAdmin)
 admin.site.register(CategoriesNews, CategoriesNewsAdmin)
 admin.site.register(Comments,CommentsAdmin)

@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -23,7 +24,21 @@ class Roles(models.Model):
 
     class Meta:
         verbose_name = "Роль пользователя"
-        verbose_name_plural = "Роли пользователей"  
+        verbose_name_plural = "Роли пользователей" 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    Role = models.ForeignKey(
+        Roles,
+        on_delete=models.CASCADE, verbose_name="Роль"
+    )
+ 
+    def __unicode__(self):
+        return self.user
+ 
+    class Meta:
+        verbose_name = 'Профиль'
+        verbose_name_plural = 'Профили'
+ 
 
 class Sports(models.Model):
     """Виды спорта"""
