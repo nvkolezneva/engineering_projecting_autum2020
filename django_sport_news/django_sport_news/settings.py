@@ -86,7 +86,7 @@ DATABASES = {
         'NAME': 'u1265686_sportnews',
         'USER': 'u1265686_default',
         'PASSWORD': 'iX!2kdD7',
-        'HOST': '37.140.192.213',
+        'HOST': 'localhost',
     }
 }
 
