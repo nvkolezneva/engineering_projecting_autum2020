@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '(9_b5fq^m@-6*y($6y2_*zvr=%5bm4z0sng5(z4f)($2^xc%h7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['nvkolezneva.ru','www.nvkolezneva.ru','127.0.0.1']
 
 
 # Application definition
@@ -82,8 +82,11 @@ WSGI_APPLICATION = 'django_sport_news.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'u1265686_sportnews',
+        'USER': 'u1265686_default',
+        'PASSWORD': 'iX!2kdD7',
+        'HOST': '37.140.192.213',
     }
 }
 
@@ -125,7 +128,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = '/static/'
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
